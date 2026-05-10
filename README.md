@@ -40,6 +40,9 @@ The Product Catalog API has been extended with:
 
 ### Local Development
 
+1. **Fork** this repository on GitHub (click the "Fork" button in the top right corner). **Uncheck** "Copy the `main` branch only" so that all exercise branches are included in your fork.
+2. **Clone** your fork:
+
 ```bash
 # Run with in-memory store (no Docker needed)
 go run ./cmd/api
