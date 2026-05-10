@@ -77,4 +77,82 @@ func TestGetProductNotFound(t *testing.T) {
 	}
 }
 
+func TestUpdateProduct(t *testing.T) {
+router, _ := setupRouter()
+
+	createBody := strings.NewReader(`{"name":"Laptop","price":999.99}`)
+	createReq := httptest.NewRequest(http.MethodPost, "/products", createBody)
+	createReq.Header.Set("Content-Type", "application/json")
+	createRec := httptest.NewRecorder()
+
+	router.ServeHTTP(createRec, createReq)
+
+	if createRec.Code != http.StatusCreated {
+		t.Fatalf("expected status 201, got %d", createRec.Code)
+	}
+
+	updateBody := strings.NewReader(`{"name":"Gaming Laptop","price":1299.99}`)
+	updateReq := httptest.NewRequest(http.MethodPut, "/products/1", updateBody)
+	updateReq.Header.Set("Content-Type", "application/json")
+	updateRec := httptest.NewRecorder()
+
+	router.ServeHTTP(updateRec, updateReq)
+
+	if updateRec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", updateRec.Code)
+	}
+
+	if !strings.Contains(updateRec.Body.String(), "Gaming Laptop") {
+		t.Errorf("expected updated product name in response, got %s", updateRec.Body.String())
+	}
+}
+
+func TestDeleteProduct(t *testing.T) {
+router, _ := setupRouter()
+
+	createBody := strings.NewReader(`{"name":"Laptop","price":999.99}`)
+	createReq := httptest.NewRequest(http.MethodPost, "/products", createBody)
+	createReq.Header.Set("Content-Type", "application/json")
+	createRec := httptest.NewRecorder()
+
+	router.ServeHTTP(createRec, createReq)
+
+	if createRec.Code != http.StatusCreated {
+		t.Fatalf("expected status 201, got %d", createRec.Code)
+	}
+
+	deleteReq := httptest.NewRequest(http.MethodDelete, "/products/1", nil)
+	deleteRec := httptest.NewRecorder()
+
+	router.ServeHTTP(deleteRec, deleteReq)
+
+	if deleteRec.Code != http.StatusOK {
+		t.Fatalf("expected status 200, got %d", deleteRec.Code)
+	}
+
+	getReq := httptest.NewRequest(http.MethodGet, "/products/1", nil)
+	getRec := httptest.NewRecorder()
+
+	router.ServeHTTP(getRec, getReq)
+
+	if getRec.Code != http.StatusNotFound {
+		t.Fatalf("expected status 404 after delete, got %d", getRec.Code)
+	}
+}
+
+func TestCreateInvalidProduct(t *testing.T) {
+router, _ := setupRouter()
+
+	body := strings.NewReader(`{"name":"","price":999.99}`)
+	req := httptest.NewRequest(http.MethodPost, "/products", body)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected status 400, got %d", rec.Code)
+	}
+}
+
 // TODO: Add tests for UpdateProduct, DeleteProduct, and invalid payloads
