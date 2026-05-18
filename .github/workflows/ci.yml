@@ -2,10 +2,10 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, exercise/03-ci-pipeline]
   pull_request:
-    branches: [main]
-
+    branches: [main, exercise/03-ci-pipeline]
+    
 jobs:
   test:
     name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
