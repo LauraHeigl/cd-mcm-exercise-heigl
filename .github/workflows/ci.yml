@@ -30,17 +30,26 @@ jobs:
       - name: Run tests with coverage
         run: go test -v -coverprofile=coverage.out ./...
 
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          echo "Total coverage: $COVERAGE%"
+          awk "BEGIN {exit !($COVERAGE >= 80)}"
+
+      - name: Generate coverage HTML
+        run: go tool cover -html=coverage.out -o coverage.html
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.go-version }}-${{ matrix.os }}
-          path: coverage.out
+          path: |
+            coverage.out
+            coverage.html
 
       - name: Build
         run: go build -o api-server ./cmd/api
 
-  # TODO: Add lint job using golangci-lint
-  # Hint: Use the golangci/golangci-lint-action@v4 action
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -59,8 +68,8 @@ jobs:
           version: latest
           args: --config=.golangci.yml
 
-
   docker-build:
+    name: Docker Build
     runs-on: ubuntu-latest
     needs: test
 
@@ -76,10 +85,6 @@ jobs:
           context: .
           push: false
           tags: product-catalog:${{ github.sha }}
-
-  # TODO: Add sonarcloud job
-  # Hint: Use the SonarSource/sonarqube-scan-action or sonarcloud-github-action
-  # You will need to configure sonar-project.properties
 
   sonarcloud:
     name: SonarCloud
@@ -101,8 +106,3 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
-        with:
-          args: >
-            -Dsonar.branch.name=exercise/03-ci-pipeline
-
-          
