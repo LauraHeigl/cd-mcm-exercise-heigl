@@ -2,23 +2,57 @@ package model
 
 import "testing"
 
+func TestValidateValidProduct(t *testing.T) {
+	p := Product{
+		Name:  "Test Product",
+		Price: 10.99,
+	}
+
+	if !p.Validate() {
+		t.Error("expected product to be valid")
+	}
+}
+
 func TestValidateEmptyName(t *testing.T) {
-	p := Product{Name: "", Price: 10.0}
+	p := Product{
+		Name:  "",
+		Price: 10.99,
+	}
+
 	if p.Validate() {
-		t.Error("expected validation to fail for empty name")
+		t.Error("expected product with empty name to be invalid")
 	}
 }
 
 func TestValidateNegativePrice(t *testing.T) {
-	p := Product{Name: "Widget", Price: -5.0}
+	p := Product{
+		Name:  "Test Product",
+		Price: -1,
+	}
+
 	if p.Validate() {
-		t.Error("expected validation to fail for negative price")
+		t.Error("expected product with negative price to be invalid")
 	}
 }
 
-func TestValidateValidProduct(t *testing.T) {
-	p := Product{Name: "Widget", Price: 9.99}
+func TestValidateZeroPrice(t *testing.T) {
+	p := Product{
+		Name:  "Free Product",
+		Price: 0,
+	}
+
 	if !p.Validate() {
-		t.Error("expected validation to pass for valid product")
+		t.Error("expected zero price to be valid")
+	}
+}
+
+func TestValidateEmptyNameAndNegativePrice(t *testing.T) {
+	p := Product{
+		Name:  "",
+		Price: -5,
+	}
+
+	if p.Validate() {
+		t.Error("expected product with empty name and negative price to be invalid")
 	}
 }
