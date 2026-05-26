@@ -1,5 +1,4 @@
-name: CI
-
+name: CI Exercise 04
 on:
   push:
     branches: [main, exercise/04-security-k8s]
