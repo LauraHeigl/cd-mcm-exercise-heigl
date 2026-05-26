@@ -1,5 +1,6 @@
 name: CI Exercise 04
 on:
+  workflow_dispatch:
   push:
     branches: [main, exercise/04-security-k8s]
   pull_request:
