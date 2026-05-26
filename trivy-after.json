@@ -1,0 +1,176 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.70.0"
+  },
+  "ReportID": "019e640b-b4e3-7602-9ca6-cf7f0c2b61f4",
+  "CreatedAt": "2026-05-26T13:29:09.3473939+02:00",
+  "ArtifactID": "sha256:ac6ef994f946ccfc90ddd706ba7fe0bf29528b6e30e4ab8a5da882b701bafedb",
+  "ArtifactName": "product-catalog:latest",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "Size": 7376384,
+    "ImageID": "sha256:bbec11048cabb7034a4b2e580c0d85e7a2a37c9910b99cdaaa3082e51c3e3b7a",
+    "DiffIDs": [
+      "sha256:ba8d5a8a96c003b7901b914022279d7b7f316a0e50e94075e548ea035e510232",
+      "sha256:e90bcee23c301268c4d4ea7eada4776265cf9b7df240a3385551c242d911448e",
+      "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+    ],
+    "RepoTags": [
+      "product-catalog:latest"
+    ],
+    "RepoDigests": [
+      "product-catalog@sha256:bbec11048cabb7034a4b2e580c0d85e7a2a37c9910b99cdaaa3082e51c3e3b7a"
+    ],
+    "Reference": "product-catalog:latest",
+    "ImageConfig": {
+      "architecture": "amd64",
+      "created": "2026-05-26T11:15:33.707186307Z",
+      "history": [
+        {
+          "created": "2026-05-26T11:15:09Z",
+          "created_by": "WORKDIR /app",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-05-26T11:15:33Z",
+          "created_by": "COPY /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-05-26T11:15:33Z",
+          "created_by": "COPY /api-server /api-server # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-05-26T11:15:33Z",
+          "created_by": "EXPOSE [8080/tcp]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-05-26T11:15:33Z",
+          "created_by": "USER 65532:65532",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-05-26T11:15:33Z",
+          "created_by": "ENTRYPOINT [\"/api-server\"]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:ba8d5a8a96c003b7901b914022279d7b7f316a0e50e94075e548ea035e510232",
+          "sha256:e90bcee23c301268c4d4ea7eada4776265cf9b7df240a3385551c242d911448e",
+          "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+        ]
+      },
+      "config": {
+        "Entrypoint": [
+          "/api-server"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "User": "65532:65532",
+        "WorkingDir": "/app",
+        "ExposedPorts": {
+          "8080/tcp": {}
+        }
+      }
+    },
+    "Layers": [
+      {
+        "Size": 1536,
+        "Digest": "sha256:e283b41ec35b00065fafcc310e7d841910ed4514ea88b92c9caa198c33971788",
+        "DiffID": "sha256:ba8d5a8a96c003b7901b914022279d7b7f316a0e50e94075e548ea035e510232"
+      },
+      {
+        "Size": 221184,
+        "Digest": "sha256:98cbb3a3df0af03094a452d6d072b1ff9f742f06ae42ceddea3212f3b4ae9742",
+        "DiffID": "sha256:e90bcee23c301268c4d4ea7eada4776265cf9b7df240a3385551c242d911448e"
+      },
+      {
+        "Size": 7153664,
+        "Digest": "sha256:f2f01f5667b49efbe1bb660a381539707ba5290c354d79c111c73345afe469e2",
+        "DiffID": "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+      }
+    ]
+  },
+  "Results": [
+    {
+      "Target": "api-server",
+      "Class": "lang-pkgs",
+      "Type": "gobinary",
+      "Packages": [
+        {
+          "ID": "github.com/mrckurz/CI-CD-MCM",
+          "Name": "github.com/mrckurz/CI-CD-MCM",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/mrckurz/ci-cd-mcm",
+            "UID": "176f4a56c424f128"
+          },
+          "Relationship": "root",
+          "DependsOn": [
+            "github.com/gorilla/mux@v1.8.1",
+            "github.com/lib/pq@v1.12.0",
+            "stdlib@v1.26.3"
+          ],
+          "Layer": {
+            "Digest": "sha256:f2f01f5667b49efbe1bb660a381539707ba5290c354d79c111c73345afe469e2",
+            "DiffID": "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "stdlib@v1.26.3",
+          "Name": "stdlib",
+          "Identifier": {
+            "PURL": "pkg:golang/stdlib@v1.26.3",
+            "UID": "a5de5691bd59d14"
+          },
+          "Version": "v1.26.3",
+          "Relationship": "direct",
+          "Layer": {
+            "Digest": "sha256:f2f01f5667b49efbe1bb660a381539707ba5290c354d79c111c73345afe469e2",
+            "DiffID": "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/gorilla/mux@v1.8.1",
+          "Name": "github.com/gorilla/mux",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/gorilla/mux@v1.8.1",
+            "UID": "488a689b4fdcb50f"
+          },
+          "Version": "v1.8.1",
+          "Layer": {
+            "Digest": "sha256:f2f01f5667b49efbe1bb660a381539707ba5290c354d79c111c73345afe469e2",
+            "DiffID": "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/lib/pq@v1.12.0",
+          "Name": "github.com/lib/pq",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/lib/pq@v1.12.0",
+            "UID": "ae1d6e3899e647f2"
+          },
+          "Version": "v1.12.0",
+          "Layer": {
+            "Digest": "sha256:f2f01f5667b49efbe1bb660a381539707ba5290c354d79c111c73345afe469e2",
+            "DiffID": "sha256:b140f168ce6058d24a6257ae31d95eb3c129aa69c383e678cbccb0ccc14e027a"
+          },
+          "AnalyzedBy": "gobinary"
+        }
+      ]
+    }
+  ]
+}
