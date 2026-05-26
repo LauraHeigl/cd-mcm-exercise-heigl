@@ -2,17 +2,19 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, exercise/04-security-k8s]
   pull_request:
-    branches: [main]
+    branches: [main, exercise/04-security-k8s]
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        go-version: ["1.26"]
-        # TODO: Add go-version "1.25" to the matrix for multi-version testing
+        go-version: ["1.25", "1.26"]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -28,41 +30,98 @@ jobs:
       - name: Run tests with coverage
         run: go test -v -coverprofile=coverage.out ./...
 
+      - name: Check coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+          echo "Total coverage: $COVERAGE%"
+          awk "BEGIN {exit !($COVERAGE >= 80)}"
+
+      - name: Generate coverage HTML
+        run: go tool cover -html=coverage.out -o coverage.html
+
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.go-version }}
-          path: coverage.out
+          name: coverage-${{ matrix.go-version }}-${{ matrix.os }}
+          path: |
+            coverage.out
+            coverage.html
 
       - name: Build
         run: go build -o api-server ./cmd/api
 
-  # TODO: Add lint job using golangci-lint
-  # Hint: Use the golangci/golangci-lint-action@v4 action
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.26"
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v4
+        with:
+          version: latest
+          args: --config=.golangci.yml
 
   docker-build:
+    name: Docker Build and Trivy Scan
     runs-on: ubuntu-latest
     needs: test
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Docker image
-        uses: docker/build-push-action@v5
+        run: docker build -t product-catalog:latest .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          context: .
-          push: false
-          tags: product-catalog:${{ github.sha }}
+          image-ref: product-catalog:latest
+          format: table
+          exit-code: "1"
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
 
-  # TODO: Add sonarcloud job
-  # Hint: Use the SonarSource/sonarqube-scan-action or sonarcloud-github-action
-  # You will need to configure sonar-project.properties
+      - name: Generate Trivy JSON report
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: product-catalog:latest
+          format: json
+          output: trivy-report.json
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH,MEDIUM,LOW
 
-  # TODO: Add vulnerability-scan job using govulncheck
-  # Hint: Install with "go install golang.org/x/vuln/cmd/govulncheck@latest"
+      - name: Upload Trivy report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json
 
-  # TODO: Add trivy-scan job for Docker image vulnerability scanning
-  # Hint: Use aquasecurity/trivy-action@master after the docker-build job
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-1.25-ubuntu-latest
+
+      - name: Run SonarCloud scan
+        uses: SonarSource/sonarqube-scan-action@v4.2.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
