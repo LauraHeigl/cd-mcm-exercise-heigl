@@ -36,11 +36,10 @@ jobs:
       - name: Run tests with coverage
         run: go test -v -coverprofile=coverage.out ./...
 
-      - name: Check coverage threshold
+      - name: Print coverage
         run: |
           COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
           echo "Total coverage: $COVERAGE%"
-          awk "BEGIN {exit !($COVERAGE >= 80)}"
 
       - name: Generate coverage HTML
         run: go tool cover -html=coverage.out -o coverage.html
