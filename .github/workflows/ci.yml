@@ -1,4 +1,5 @@
 name: CI Exercise 04
+
 on:
   workflow_dispatch:
   push:
@@ -13,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        go-version: ["1.25", "1.26"]
+        go-version: ["1.26.3"]
         os: [ubuntu-latest, macos-latest]
 
     steps:
@@ -26,6 +27,11 @@ jobs:
 
       - name: Download dependencies
         run: go mod download
+
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
 
       - name: Run tests with coverage
         run: go test -v -coverprofile=coverage.out ./...
@@ -60,7 +66,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.26"
+          go-version: "1.26.3"
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v4
@@ -118,7 +124,7 @@ jobs:
       - name: Download coverage artifact
         uses: actions/download-artifact@v4
         with:
-          name: coverage-1.25-ubuntu-latest
+          name: coverage-1.26.3-ubuntu-latest
 
       - name: Run SonarCloud scan
         uses: SonarSource/sonarqube-scan-action@v4.2.1
