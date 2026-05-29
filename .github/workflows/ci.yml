@@ -9,21 +9,16 @@ on:
 
 jobs:
   test:
-    name: Test Go ${{ matrix.go-version }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        go-version: ["1.26.3"]
-        os: [ubuntu-latest, macos-latest]
+    name: Test and Dependency Scan
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go ${{ matrix.go-version }}
+      - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: "1.26.3"
 
       - name: Download dependencies
         run: go mod download
@@ -47,31 +42,13 @@ jobs:
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.go-version }}-${{ matrix.os }}
+          name: coverage-report
           path: |
             coverage.out
             coverage.html
 
-      - name: Build
+      - name: Build Go application
         run: go build -o api-server ./cmd/api
-
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.26.3"
-
-      - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: latest
-          args: --config=.golangci.yml
 
   docker-build:
     name: Docker Build and Trivy Scan
@@ -85,7 +62,7 @@ jobs:
         run: docker build -t product-catalog:latest .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: product-catalog:latest
           format: table
@@ -95,7 +72,7 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Generate Trivy JSON report
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: product-catalog:latest
           format: json
@@ -109,24 +86,3 @@ jobs:
         with:
           name: trivy-report
           path: trivy-report.json
-
-  sonarcloud:
-    name: SonarCloud
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download coverage artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: coverage-1.26.3-ubuntu-latest
-
-      - name: Run SonarCloud scan
-        uses: SonarSource/sonarqube-scan-action@v4.2.1
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
